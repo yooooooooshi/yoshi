@@ -119,6 +119,12 @@
     <iframe onload='if(submitted){window.location="";}' id=hidden_iframe name=hidden_iframe style=display:none></iframe>
 
     <div id="comments"></div>
+
+    <p>
+      <input type="text" id="search-input" placeholder="コメントを検索">
+      <button onclick="searchComments()">検索</button>
+      <button onclick="resetSearch()">リセット</button>
+    </p>
   </div>
 
   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -131,7 +137,7 @@
       d3.select("#comments").html(text);
     });
 
-    var NGComments = ["死ね","バカ","ttps.",".exe"]; // 簡易的なNGワードの設定
+    var NGComments = ["死ね", "バカ", "ttps.", ".exe"]; // 正しい禁止ワードの設定
     var regex = new RegExp(NGComments.join("|"));
     function test(wcheck) {
       if (wcheck.match(regex) != null) {
@@ -149,6 +155,26 @@
         inputs[i].value = inputs[i].value.replace( /</g ,'&lt;' );
       }
       return submitted=!0;
+    }
+
+    function searchComments() {
+      var input = document.getElementById("search-input").value.toLowerCase();
+      var comments = document.querySelectorAll("#comments pre");
+      for (var i = 0; i < comments.length; i++) {
+        var commentText = comments[i].textContent.toLowerCase();
+        if (commentText.includes(input)) {
+          comments[i].style.display = "block";
+        } else {
+          comments[i].style.display = "none";
+        }
+      }
+    }
+
+    function resetSearch() {
+      var comments = document.querySelectorAll("#comments pre");
+      for (var i = 0; i < comments.length; i++) {
+        comments[i].style.display = "block";
+      }
     }
   </script>
 </body>
