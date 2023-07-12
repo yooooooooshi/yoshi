@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>自己紹介</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fff;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      color: #ff5722;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 36px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    p {
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .highlight {
+      color: #ff9800;
+      font-weight: bold;
+    }
+
+    .contact {
+      text-align: center;
+    }
+
+    .contact a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    /* フォーム全体のスタイル */
+    form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* 入力フィールドのスタイル */
+    input[type="text"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* 送信ボタンのスタイル */
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* コメント表示エリアのスタイル */
+    #comments {
+      margin-top: 20px;
+    }
+
+    /* コメントのスタイル */
+    #comments pre {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    /* エラーメッセージのスタイル */
+    .error-message {
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>自己紹介</h1>
+    <p>こんにちは、私は<span class="highlight">石井義人</span>です。</p>
+    <p>趣味は<span class="highlight">寝ること</span>で、特技は<span class="highlight">ない</span>です。</p>
+    <p>興味のある分野は<span class="highlight">パソコン</span>で、現在は<span class="highlight">プログラミング</span>をしています。</p>
+    <p>これまでに<span class="highlight">webサイトを作ったこと</span>があり、<span class="highlight">将来はサーバー建築</span>がしたいです。</p>
+    <p class="contact">ご興味がありましたら、お気軽に<a href="tel:0120-107-929">0120-107-929</a>までご連絡ください。</p>
+    
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSf41F10y8bYu2Wzd-OCLoV7mNZEEWAtIk8F58sz4gNx79nhMQ/formResponse" target="hidden_iframe" method="post" onsubmit="return test(this.wcheck.value)">
+      <p><input name="entry.1751283930" placeholder="名前" value="名無し" required></p>
+      <p><input name="entry.1253778115" placeholder="メールアドレス" type="email"></p>
+      <p><textarea name="entry.700734687" placeholder="コメント" rows="10" cols="40" maxlength="400" id="wcheck" required></textarea></p>
+      <input type="submit" id="submitbutton" value="送信">
+    </form>
+    <iframe onload='if(submitted){window.location="";}' id=hidden_iframe name=hidden_iframe style=display:none></iframe>
+
+    <div id="comments"></div>
+  </div>
+
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script>
+    d3.csv("https://docs.google.com/spreadsheets/d/1YYORfM6E7hk8YogEgW4fxeG_8_j4Z9IoNZGj0L8SDG4/export?format=csv&range=A3:D", function(error, data){
+      var text = "";
+      for(var i=0; i<data.length; i++){
+        text += i+1 + " 名前: <a href=\"mailto:" + data[i].Mail + "\">" + data[i].Name + "</a> " + data[i].Timestamp + "<pre>" + data[i].Comments + "</pre>";
+      }
+      d3.select("#comments").html(text);
+    });
+
+    var NGComments = ["死ね","バカ","ttps.",".exe"]; // 簡易的なNGワードの設定
+    var regex = new RegExp(NGComments.join("|"));
+    function test(wcheck) {
+      if (wcheck.match(regex) != null) {
+        alert("ERROR: コメントにNGワードまたは、リンクが含まれています");
+        return false;
+      }
+      document.getElementById("submitbutton").disabled = true;
+      textareas = document.getElementsByTagName('textarea');
+      for(var i=0 ;i < textareas.length ;i ++ ){
+        textareas[i].value = textareas[i].value.replace( /</g ,'&lt;' );
+      }
+      inputs = document.getElementsByTagName('input');
+      for(var i=0 ;i < inputs.length ;i ++ ){
+        inputs[i].value = inputs[i].value.replace( /</g ,'&lt;' );
+      }
+      return submitted=!0;
+    }
+  </script>
+</body>
+</html>
