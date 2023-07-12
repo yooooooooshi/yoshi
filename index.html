@@ -40,6 +40,7 @@
 
     .contact {
       text-align: center;
+      margin-top: 30px;
     }
 
     .contact a {
@@ -78,6 +79,8 @@
     /* コメント表示エリアのスタイル */
     #comments {
       margin-top: 20px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
     }
 
     /* コメントのスタイル */
@@ -111,6 +114,7 @@
       <p><input name="entry.1253778115" placeholder="メールアドレス" type="email"></p>
       <p><textarea name="entry.700734687" placeholder="コメント" rows="10" cols="40" maxlength="400" id="wcheck" required></textarea></p>
       <input type="submit" id="submitbutton" value="送信">
+      <p class="error-message" id="error-message" style="display: none; color: red; font-weight: bold;"></p>
     </form>
     <iframe onload='if(submitted){window.location="";}' id=hidden_iframe name=hidden_iframe style=display:none></iframe>
 
@@ -122,7 +126,7 @@
     d3.csv("https://docs.google.com/spreadsheets/d/1YYORfM6E7hk8YogEgW4fxeG_8_j4Z9IoNZGj0L8SDG4/export?format=csv&range=A3:D", function(error, data){
       var text = "";
       for(var i=0; i<data.length; i++){
-        text += i+1 + " 名前: <a href=\"mailto:" + data[i].Mail + "\">" + data[i].Name + "</a> " + data[i].Timestamp + "<pre>" + data[i].Comments + "</pre>";
+        text += '<div><strong>' + (i+1) + ' 名前: </strong><a href="mailto:' + data[i].Mail + '">' + data[i].Name + '</a> (' + data[i].Timestamp + ')</div><pre>' + data[i].Comments + '</pre>';
       }
       d3.select("#comments").html(text);
     });
@@ -131,7 +135,8 @@
     var regex = new RegExp(NGComments.join("|"));
     function test(wcheck) {
       if (wcheck.match(regex) != null) {
-        alert("ERROR: コメントにNGワードまたは、リンクが含まれています");
+        document.getElementById("error-message").textContent = "ERROR: コメントにNGワードまたは、リンクが含まれています";
+        document.getElementById("error-message").style.display = "block";
         return false;
       }
       document.getElementById("submitbutton").disabled = true;
