@@ -161,7 +161,7 @@
     <p>興味のある分野は<span class="highlight">パソコン</span>で、現在は<span class="highlight">プログラミング</span>をしています。</p>
     <p>これまでに<span class="highlight">webサイトを作ったこと</span>があり、<span class="highlight">将来はサーバー建築</span>がしたいです。</p>
     <p class="contact">ご興味がありましたら、お気軽に<a href="tel:0120-107-929">0120-107-929</a>までご連絡ください。</p>
-    
+
     <form action="https://docs.google.com/forms/d/e/1FAIpQLSf41F10y8bYu2Wzd-OCLoV7mNZEEWAtIk8F58sz4gNx79nhMQ/formResponse" target="hidden_iframe" method="post" onsubmit="return test(this.wcheck.value)">
       <p><input name="entry.1751283930" placeholder="名前" value="名無し" required></p>
       <p><input name="entry.1253778115" placeholder="メールアドレス" type="email"></p>
@@ -191,17 +191,34 @@
 
   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script>
-    d3.csv("https://docs.google.com/spreadsheets/d/1YYORfM6E7hk8YogEgW4fxeG_8_j4Z9IoNZGj0L8SDG4/export?format=csv&range=A3:D", function(error, data){
-      var text = "";
-      for(var i=0; i<data.length; i++){
-        text += '<div><strong>' + (i+1) + ' 名前: </strong><a href="mailto:' + data[i].Mail + '">' + data[i].Name + '</a> (' + data[i].Timestamp + ')</div><pre>' + data[i].Comments + '</pre>';
-      }
-      d3.select("#comments").html(text);
-    });
+    var commentData = []; // コメントデータを保持する配列
 
-    var NGComments = ["死ね", "バカ", "不適切な単語"]; // 不適切なワードの設定
-    var regex = new RegExp(NGComments.join("|"));
+    function loadComments() {
+      d3.csv("https://docs.google.com/spreadsheets/d/1YYORfM6E7hk8YogEgW4fxeG_8_j4Z9IoNZGj0L8SDG4/export?format=csv&range=A3:D", function(error, data){
+        var newComments = [];
+        for(var i=0; i<data.length; i++){
+          var comment = '<div><strong>' + (i+1) + ' 名前: </strong><a href="mailto:' + data[i].Mail + '">' + data[i].Name + '</a> (' + data[i].Timestamp + ')</div><pre>' + data[i].Comments + '</pre>';
+          newComments.push(comment);
+        }
+        // 新しいコメントのみを追加する
+        var commentsContainer = document.getElementById("comments");
+        for (var j = newComments.length - 1; j >= 0; j--) {
+          var commentElement = document.createElement("div");
+          commentElement.innerHTML = newComments[j];
+          commentsContainer.prepend(commentElement);
+        }
+        commentData = newComments; // コメントデータを更新
+      });
+    }
+
+    function autoLoadComments() {
+      loadComments();
+      setInterval(loadComments, 5000); // 5秒ごとにコメントを自動で読み込む
+    }
+
     function test(wcheck) {
+      var NGComments = ["死ね", "バカ", "不適切な単語"]; // 不適切なワードの設定
+      var regex = new RegExp(NGComments.join("|"));
       if (wcheck.match(regex) != null) {
         document.getElementById("error-message").textContent = "ERROR: 不適切なコメントです";
         document.getElementById("error-message").style.display = "block";
@@ -230,6 +247,8 @@
         comments[i].style.display = "block";
       }
     }
+
+    document.addEventListener("DOMContentLoaded", autoLoadComments);
   </script>
 </body>
 </html>
