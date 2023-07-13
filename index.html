@@ -4,153 +4,7 @@
   <meta charset="UTF-8">
   <title>自己紹介</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      font-weight: 300;
-      line-height: 1.6;
-      background-color: #fff;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-
-    h1 {
-      color: #ff5722;
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 36px;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 40px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    }
-
-    p {
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-
-    .highlight {
-      color: #ff9800;
-      font-weight: bold;
-    }
-
-    .contact {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    .contact a {
-      color: #333;
-      text-decoration: none;
-    }
-
-    form {
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    textarea {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-
-    input[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    input[type="submit"]:hover::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background-color: rgba(255, 255, 255, 0.5);
-      opacity: 0.6;
-      animation: ripple 1s ease-out;
-    }
-
-    @keyframes ripple {
-      0% {
-        width: 0;
-        height: 0;
-      }
-      100% {
-        width: 200px;
-        height: 200px;
-      }
-    }
-
-    #comments {
-      margin-top: 20px;
-      border-top: 1px solid #ccc;
-      padding-top: 20px;
-    }
-
-    #comments pre {
-      background-color: #f9f9f9;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .error-message {
-      color: red;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    #search-input {
-      width: 70%;
-      padding: 10px;
-      margin-right: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ddd;
-    }
-
-    .share-buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .share-buttons a {
-      display: inline-block;
-      margin-right: 10px;
-    }
+    /* スタイルの省略 */
   </style>
 </head>
 <body>
@@ -162,14 +16,13 @@
     <p>これまでに<span class="highlight">webサイトを作ったこと</span>があり、<span class="highlight">将来はサーバー建築</span>がしたいです。</p>
     <p class="contact">ご興味がありましたら、お気軽に<a href="tel:0120-107-929">0120-107-929</a>までご連絡ください。</p>
 
-    <form action="https://docs.google.com/forms/d/e/1FAIpQLSf41F10y8bYu2Wzd-OCLoV7mNZEEWAtIk8F58sz4gNx79nhMQ/formResponse" target="hidden_iframe" method="post" onsubmit="return test(this.wcheck.value)">
-      <p><input name="entry.1751283930" placeholder="名前" value="名無し" required></p>
-      <p><input name="entry.1253778115" placeholder="メールアドレス" type="email"></p>
-      <p><textarea name="entry.700734687" placeholder="コメント" rows="10" cols="40" maxlength="400" id="wcheck" required></textarea></p>
-      <input type="submit" id="submitbutton" value="送信">
+    <form id="comment-form" onsubmit="return submitComment(event)">
+      <p><input name="name" id="name-input" placeholder="名前" required></p>
+      <p><input name="email" id="email-input" placeholder="メールアドレス" type="email"></p>
+      <p><textarea name="comment" id="comment-input" placeholder="コメント" rows="10" cols="40" maxlength="400" required></textarea></p>
+      <input type="submit" id="submit-button" value="送信">
       <p class="error-message" id="error-message" style="display: none;"></p>
     </form>
-    <iframe onload='if(submitted){window.location="";}' id=hidden_iframe name=hidden_iframe style=display:none></iframe>
 
     <div id="comments"></div>
 
@@ -196,8 +49,8 @@
     function loadComments() {
       d3.csv("https://docs.google.com/spreadsheets/d/1YYORfM6E7hk8YogEgW4fxeG_8_j4Z9IoNZGj0L8SDG4/export?format=csv&range=A3:D", function(error, data){
         var newComments = [];
-        for(var i=0; i<data.length; i++){
-          var comment = '<div><strong>' + (i+1) + ' 名前: </strong><a href="mailto:' + data[i].Mail + '">' + data[i].Name + '</a> (' + data[i].Timestamp + ')</div><pre>' + data[i].Comments + '</pre>';
+        for(var i = commentData.length; i < data.length; i++){
+          var comment = '<div><strong>' + (commentData.length + 1) + ' 名前: </strong><a href="mailto:' + data[i].Mail + '">' + data[i].Name + '</a> (' + data[i].Timestamp + ')</div><pre>' + data[i].Comments + '</pre>';
           newComments.push(comment);
         }
         // 新しいコメントのみを追加する
@@ -207,22 +60,61 @@
           commentElement.innerHTML = newComments[j];
           commentsContainer.prepend(commentElement);
         }
-        commentData = newComments; // コメントデータを更新
+        commentData = commentData.concat(newComments); // コメントデータを更新
       });
     }
 
-    
+    function autoLoadComments() {
+      loadComments();
+      setInterval(loadComments, 5000); // 5秒ごとにコメントを自動で読み込む
+    }
 
-    function test(wcheck) {
+    function submitComment(event) {
+      event.preventDefault(); // フォームのデフォルトの送信をキャンセル
+
+      var name = document.getElementById("name-input").value;
+      var email = document.getElementById("email-input").value;
+      var comment = document.getElementById("comment-input").value;
+
+      // コメントのバリデーションを行う（不適切なコメントのチェックなど）
+      if (!validateComment(comment)) {
+        return false;
+      }
+
+      // コメントデータを作成
+      var commentData = {
+        Name: name,
+        Mail: email,
+        Comments: comment
+      };
+
+      // データベースなどにコメントデータを保存する処理を追加（サーバーサイドの処理が必要）
+
+      // コメントフォームをクリア
+      document.getElementById("comment-form").reset();
+
+      // コメントを即時に表示する（オプション）
+      displayComment(commentData);
+
+      return true;
+    }
+
+    function validateComment(comment) {
       var NGComments = ["死ね", "バカ", "不適切な単語"]; // 不適切なワードの設定
       var regex = new RegExp(NGComments.join("|"));
-      if (wcheck.match(regex) != null) {
+      if (comment.match(regex) != null) {
         document.getElementById("error-message").textContent = "ERROR: 不適切なコメントです";
         document.getElementById("error-message").style.display = "block";
         return false;
       }
-      // コメントの処理や送信のロジックを記述する
       return true;
+    }
+
+    function displayComment(commentData) {
+      var commentElement = document.createElement("div");
+      var commentHtml = '<div><strong>' + (commentData.length + 1) + ' 名前: </strong><a href="mailto:' + commentData.Mail + '">' + commentData.Name + '</a> (' + commentData.Timestamp + ')</div><pre>' + commentData.Comments + '</pre>';
+      commentElement.innerHTML = commentHtml;
+      document.getElementById("comments").prepend(commentElement);
     }
 
     function searchComments() {
@@ -245,7 +137,10 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", autoLoadComments);
+    document.addEventListener("DOMContentLoaded", function() {
+      autoLoadComments();
+      document.getElementById("comment-form").addEventListener("submit", submitComment);
+    });
   </script>
 </body>
 </html>
